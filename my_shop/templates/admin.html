@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>อัมรินทร์ Shop - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --brand-dark:#3f2a1f; --brand-cream:#f8f3e8; --sidebar-width:260px; }
+    body { margin:0; font-family:'Mali', sans-serif; background:var(--brand-cream); scroll-behavior:smooth; }
+    .admin-layout { display:flex; min-height:100vh; }
+    .sidebar { width:var(--sidebar-width); background:var(--brand-dark); color:#f7ecda; padding:1.2rem 1rem; position:fixed; top:0; bottom:0; left:0; overflow-y:auto; transition:transform .3s ease; z-index:1040; }
+    .sidebar-logo { font-size:1.1rem; font-weight:700; margin-bottom:1rem; display:block; color:#fff; text-decoration:none; }
+    .sidebar .menu-item { display:flex; align-items:center; gap:10px; color:#f7e8d0; text-decoration:none; border-radius:10px; padding:.62rem .72rem; margin-bottom:.35rem; transition:background-color .2s ease; }
+    .sidebar .menu-item:hover { background:rgba(255,255,255,.13); }
+    .sidebar .menu-item.active { background:#2a1911; font-weight:700; }
+    .content-wrap { margin-left:var(--sidebar-width); padding:1.25rem; width:calc(100% - var(--sidebar-width)); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+    .title { margin:0; font-size:1.35rem; font-weight:700; color:var(--brand-dark); }
+    .stats-card, .section-card { border:0; border-radius:14px; box-shadow:0 8px 16px rgba(64,47,36,.11); }
+    .stats-icon { font-size:1.55rem; opacity:.85; }
+    .stats-value { font-size:1.3rem; font-weight:700; color:var(--brand-dark); }
+    .table thead { background:#efe3d0; }
+    .table-hover tbody tr:hover { background:#f8f1e6; }
+    .mobile-toggle { display:none; border:0; border-radius:8px; background:var(--brand-dark); color:#fff; padding:.45rem .65rem; }
+    .dark-toggle { border-radius:999px; border:0; background:#212529; color:#fff; padding:.45rem .9rem; }
+    .thumb { width:54px; height:54px; object-fit:cover; border-radius:8px; }
+    .section-anchor { scroll-margin-top: 16px; }
+    body.admin-dark { background:#141414; color:#f1f1f1; }
+    body.admin-dark .content-wrap, body.admin-dark .title, body.admin-dark .stats-value { color:#fff; }
+    body.admin-dark .section-card, body.admin-dark .stats-card { background:#1f1f1f; color:#f1f1f1; border:1px solid #303030; box-shadow:none; }
+    body.admin-dark .table { color:#f1f1f1; }
+    body.admin-dark .table thead { background:#2a2a2a; }
+    body.admin-dark .table-hover tbody tr:hover { background:#262626; }
+    @media (max-width: 991.98px) {
+      .mobile-toggle { display:inline-block; }
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.show { transform:translateX(0); }
+      .content-wrap { width:100%; margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside id="sidebar" class="sidebar">
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-logo">🛍️ อัมรินทร์ Shop</a>
+      <a class="menu-item" data-target="dashboard" href="#dashboard-section">📊 Dashboard</a>
+      <a class="menu-item" data-target="products" href="#products-section">📦 Products</a>
+      <a class="menu-item" data-target="orders" href="#orders-section">🧾 Orders</a>
+      <a class="menu-item" data-target="users" href="#users-section">👥 Users</a>
+      <a class="menu-item" href="{{ url_for('logout') }}">🚪 Logout</a>
+    </aside>
+
+    <main class="content-wrap">
+      <div class="topbar">
+        <div class="d-flex align-items-center gap-2">
+          <button class="mobile-toggle" id="sidebarToggle">☰</button>
+          <h1 class="title">Admin Dashboard</h1>
+        </div>
+        <button class="dark-toggle" id="darkModeToggle">🌙 Dark Mode</button>
+      </div>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="alert alert-info" role="alert">
+            {{ messages[-1] }}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section id="dashboard-section" class="section-anchor mb-4">
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">💰</div><div><div class="small text-muted">ยอดขายวันนี้</div><div class="stats-value">฿{{ '%.2f'|format(today_sales) }}</div></div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">🧾</div><div><div class="small text-muted">จำนวนออเดอร์วันนี้</div><div class="stats-value">{{ today_orders }}</div></div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">📦</div><div><div class="small text-muted">จำนวนสินค้า</div><div class="stats-value">{{ product_count }}</div></div></div></div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">👥</div><div><div class="small text-muted">จำนวนลูกค้า</div><div class="stats-value">{{ user_count }}</div></div></div></div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">🧾</div><div><div class="small text-muted">จำนวนออเดอร์รวม</div><div class="stats-value">{{ total_orders }}</div></div></div></div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card stats-card"><div class="card-body d-flex align-items-center gap-3"><div class="stats-icon">🏦</div><div><div class="small text-muted">ยอดขายรวม</div><div class="stats-value">฿{{ '%.2f'|format(total_sales) }}</div></div></div></div>
+        </div>
+      </div>
+
+      <div class="card section-card">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">ออเดอร์ล่าสุด 5 รายการ</h2>
+          {% if latest_orders %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>ลูกค้า</th>
+                  <th>วันที่</th>
+                  <th>ราคารวม</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in latest_orders %}
+                <tr>
+                  <td>#{{ order.id }}</td>
+                  <td>{{ order.customer_name }}</td>
+                  <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>฿{{ '%.2f'|format(order.total_price) }}</td>
+                  <td>
+                    {% if order.status == 'pending' %}
+                      <span class="badge text-bg-warning">รอดำเนินการ</span>
+                    {% elif order.status == 'shipped' %}
+                      <span class="badge text-bg-success">จัดส่งแล้ว</span>
+                    {% else %}
+                      <span class="badge text-bg-danger">ยกเลิก</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+            <p class="text-muted mb-0">ยังไม่มีรายการสั่งซื้อ</p>
+          {% endif %}
+        </div>
+      </div>
+      </section>
+
+      <section id="products-section" class="section-anchor mb-4">
+        <div class="card section-card">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Products</h2>
+              <a class="btn btn-success btn-sm" href="{{ url_for('add_product') }}">เพิ่มสินค้า</a>
+            </div>
+            {% if products %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>รูปสินค้า</th>
+                    <th>ชื่อ</th>
+                    <th>ราคา</th>
+                    <th>สต็อก</th>
+                    <th class="text-end">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product in products %}
+                  <tr>
+                    <td>{% if product.image_url %}<img class="thumb" src="{{ product.image_url }}" alt="{{ product.name }}">{% else %}-{% endif %}</td>
+                    <td>{{ product.name }}</td>
+                    <td>฿{{ '%.2f'|format(product.price) }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td class="text-end">
+                      <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">แก้ไข</a>
+                      <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ product.id }}">ลบ</button>
+                    </td>
+                  </tr>
+
+                  <div class="modal fade" id="deleteModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">ยืนยันการลบสินค้า</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">ต้องการลบสินค้า <strong>{{ product.name }}</strong> ใช่หรือไม่?</div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                          <form method="post" action="{{ url_for('delete_product', product_id=product.id) }}">
+                            <button type="submit" class="btn btn-danger">ยืนยันลบ</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <p class="text-muted mb-0">ยังไม่มีสินค้า</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <section id="orders-section" class="section-anchor mb-4">
+        <div class="card section-card">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-3">Orders</h2>
+            {% if orders %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Order</th><th>ลูกค้า</th><th>วันที่</th><th>ยอดรวม</th><th>สถานะ</th><th>เปลี่ยนสถานะ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders %}
+                  <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>฿{{ '%.2f'|format(order.total_price) }}</td>
+                    <td>
+                      {% if order.status == 'pending' %}
+                        <span class="badge text-bg-warning">รอดำเนินการ</span>
+                      {% elif order.status == 'shipped' %}
+                        <span class="badge text-bg-success">จัดส่งแล้ว</span>
+                      {% else %}
+                        <span class="badge text-bg-danger">ยกเลิก</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <form method="post" action="{{ url_for('update_order_status', order_id=order.id) }}" class="d-flex gap-2">
+                        <select name="status" class="form-select form-select-sm" style="min-width:130px;">
+                          <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>รอดำเนินการ</option>
+                          <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>จัดส่งแล้ว</option>
+                          <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>ยกเลิก</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">บันทึก</button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <p class="text-muted mb-0">ยังไม่มีรายการสั่งซื้อ</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <section id="users-section" class="section-anchor mb-2">
+        <div class="card section-card">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-3">Users</h2>
+            {% if users %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>ชื่อ</th><th>Username</th><th>เบอร์โทร</th><th>สมัครเมื่อ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in users %}
+                  <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.phone or '-' }}</td>
+                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <p class="text-muted mb-0">ยังไม่มีผู้ใช้ในระบบ</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const menuItems = document.querySelectorAll('.menu-item[data-target]');
+
+    sidebarToggle?.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
+
+    menuItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        menuItems.forEach((m) => m.classList.remove('active'));
+        item.classList.add('active');
+        if (window.innerWidth < 992) {
+          sidebar.classList.remove('show');
+        }
+      });
+    });
+
+    const selectedSection = '{{ selected_section }}';
+    if (selectedSection && selectedSection !== 'dashboard') {
+      const target = document.getElementById(`${selectedSection}-section`);
+      const activeItem = document.querySelector(`.menu-item[data-target="${selectedSection}"]`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (activeItem) {
+        menuItems.forEach((m) => m.classList.remove('active'));
+        activeItem.classList.add('active');
+      }
+    } else {
+      const dashboardItem = document.querySelector('.menu-item[data-target="dashboard"]');
+      dashboardItem?.classList.add('active');
+    }
+
+    const darkModeEnabled = localStorage.getItem('admin_dark_mode') === '1';
+    if (darkModeEnabled) {
+      document.body.classList.add('admin-dark');
+      darkToggle.textContent = '☀️ Light Mode';
+    }
+
+    darkToggle?.addEventListener('click', () => {
+      document.body.classList.toggle('admin-dark');
+      const isDark = document.body.classList.contains('admin-dark');
+      localStorage.setItem('admin_dark_mode', isDark ? '1' : '0');
+      darkToggle.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    });
+  </script>
+</body>
+</html>

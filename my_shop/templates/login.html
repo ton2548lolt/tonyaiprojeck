@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>อัมรินทร์ Shop - Admin Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --brand-dark: #3f2a1f;
+      --brand-cream: #f7f2e8;
+      --brand-main: #3e6b53;
+      --brand-main-hover: #2f5743;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Mali', sans-serif;
+      background: linear-gradient(120deg, rgba(63, 42, 31, 0.86), rgba(62, 107, 83, 0.78)),
+        url('https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1600&q=80') center/cover;
+      animation: pageFade 0.7s ease;
+    }
+
+    .login-overlay {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(25, 20, 17, 0.38);
+      backdrop-filter: blur(3px);
+    }
+
+    .login-card {
+      width: min(430px, 90vw);
+      background: rgba(255, 251, 243, 0.95);
+      border: 0;
+      border-radius: 22px;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.24);
+      animation: cardPop 0.55s ease;
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--brand-dark);
+      margin-bottom: 0;
+    }
+
+    .brand-tagline {
+      color: #6f5845;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      border-radius: 999px;
+      border: 1px solid #decfb5;
+      box-shadow: 0 3px 8px rgba(63, 42, 31, 0.09);
+      padding-left: 2.5rem;
+      min-height: 48px;
+    }
+
+    .form-control:focus {
+      border-color: var(--brand-main);
+      box-shadow: 0 0 0 0.2rem rgba(62, 107, 83, 0.2);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8a725b;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .btn-login {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      min-height: 48px;
+      color: #fff;
+      font-weight: 700;
+      background: var(--brand-main);
+      box-shadow: 0 10px 16px rgba(62, 107, 83, 0.25);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-login:hover {
+      background: var(--brand-main-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-login:active {
+      transform: scale(0.97);
+    }
+
+    .btn-login .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      background: rgba(255, 255, 255, 0.45);
+      pointer-events: none;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      color: #8f7a65;
+      font-size: 0.85rem;
+      gap: 10px;
+      margin: 1.15rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      height: 1px;
+      background: #d8c8af;
+      flex: 1;
+    }
+
+    .btn-register {
+      width: 100%;
+      border-radius: 999px;
+      min-height: 46px;
+      font-weight: 700;
+    }
+
+    @keyframes pageFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes cardPop {
+      0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes ripple {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    @media (max-width: 576px) {
+      .login-overlay {
+        padding: 1rem;
+      }
+
+      .login-card {
+        width: 90%;
+      }
+
+      .form-control,
+      .btn-login,
+      .btn-register {
+        min-height: 52px;
+      }
+
+      .card-body {
+        padding: 1.6rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-overlay">
+    <div class="card login-card">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="fs-2">🛍️</div>
+          <h1 class="h3 brand-title">อัมรินทร์ Shop</h1>
+          <p class="brand-tagline mb-0">Admin Login สำหรับผู้ดูแลระบบ</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-danger" role="alert">
+              {{ messages[-1] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('login') }}">
+          <div class="mb-3 position-relative">
+            <span class="input-icon">✉️</span>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Email หรือ Username" required>
+          </div>
+          <div class="mb-2 position-relative">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+          </div>
+          <div class="text-end mb-3">
+            <a href="#" class="small text-decoration-none">ลืมรหัสผ่าน?</a>
+          </div>
+          <button type="submit" class="btn-login" id="loginBtn">เข้าสู่ระบบ</button>
+        </form>
+
+        <p class="small text-center text-muted mt-2 mb-0">บัญชีทดสอบแอดมิน: <strong>admin / 1234</strong></p>
+
+        <div class="divider">หรือ</div>
+
+        <a href="{{ url_for('user_login') }}" class="btn btn-outline-secondary btn-register">ไปหน้า Customer Login</a>
+        <p class="text-center mt-2 mb-0"><a href="{{ url_for('register') }}">สมัครสมาชิกลูกค้า</a> · <a href="{{ url_for('index') }}">กลับหน้าหลัก</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', function (event) {
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = event.clientX - rect.left - size / 2 + 'px';
+      ripple.style.top = event.clientY - rect.top - size / 2 + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  </script>
+</body>
+</html>

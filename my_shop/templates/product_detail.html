@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ product.name }} - อัมรินทร์ Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f7f1e3; }
+    .detail-card { border: 0; border-radius: 16px; box-shadow: 0 12px 24px rgba(0,0,0,.08); }
+    .detail-image { width: 100%; max-height: 430px; object-fit: cover; border-radius: 16px; }
+    .btn { border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background:#4b2e1f;">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('index') }}">อัมรินทร์ Shop</a>
+      <div class="ms-auto d-flex gap-2">
+        <a class="btn btn-outline-light btn-sm" href="{{ url_for('cart') }}">Cart <span data-cart-badge class="badge text-bg-light d-none">0</span></a>
+        <a class="btn btn-light btn-sm" href="{{ url_for('index') }}">Back</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="card detail-card p-3 p-md-4">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-6">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" class="detail-image">
+        </div>
+        <div class="col-md-6">
+          <h1 class="h2">{{ product.name }}</h1>
+          <p class="text-muted mb-2">หมวดหมู่: {{ product.category }}</p>
+          <p class="mb-2">⭐ {{ '%.1f'|format(product.rating) }}</p>
+          <p>{{ product.description or 'ไม่มีรายละเอียดเพิ่มเติม' }}</p>
+          <h3 class="text-success mb-3">฿{{ '%.2f'|format(product.price) }}</h3>
+          <div class="d-flex gap-2">
+            <button
+              id="addBtn"
+              class="btn btn-primary"
+              data-id="{{ product.id }}"
+              data-name="{{ product.name }}"
+              data-price="{{ product.price }}"
+              data-image="{{ product.image_url }}"
+            >Add to Cart</button>
+            <button
+              id="wishlistBtn"
+              class="btn btn-outline-danger"
+              data-id="{{ product.id }}"
+              data-name="{{ product.name }}"
+              data-price="{{ product.price }}"
+              data-image="{{ product.image_url }}"
+            >Wishlist</button>
+          </div>
+          <hr>
+          <p class="mb-1 fw-semibold">Review</p>
+          <p class="text-muted">{{ product.review_text or 'ยังไม่มีรีวิว' }}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='store.js') }}"></script>
+  <script>
+    document.getElementById('addBtn').addEventListener('click', function () {
+      addToCart({
+        id: Number(this.dataset.id),
+        name: this.dataset.name,
+        price: Number(this.dataset.price),
+        image_url: this.dataset.image,
+      });
+      this.textContent = 'Added';
+      setTimeout(() => this.textContent = 'Add to Cart', 900);
+    });
+
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    if (isWishlist(Number(wishlistBtn.dataset.id))) {
+      wishlistBtn.textContent = 'Wishlisted';
+    }
+    wishlistBtn.addEventListener('click', function () {
+      const active = toggleWishlist({
+        id: Number(this.dataset.id),
+        name: this.dataset.name,
+        price: Number(this.dataset.price),
+        image_url: this.dataset.image,
+      });
+      this.textContent = active ? 'Wishlisted' : 'Wishlist';
+    });
+  </script>
+</body>
+</html>

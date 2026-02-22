@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if mode == 'add' %}เพิ่มสินค้า{% else %}แก้ไขสินค้า{% endif %} - อัมรินทร์ Shop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f8f3e8; }
+    .card { border:0; border-radius:14px; box-shadow:0 8px 16px rgba(64,47,36,.11); }
+  </style>
+</head>
+<body>
+  <main class="container py-4" style="max-width:840px;">
+    <div class="d-flex flex-wrap gap-2 justify-content-end mb-3">
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_products') }}">Products</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_orders') }}">Orders</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users') }}">Users</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}<div class="alert alert-warning">{{ messages[-1] }}</div>{% endif %}
+    {% endwith %}
+
+    <div class="card">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">{% if mode == 'add' %}เพิ่มสินค้า{% else %}แก้ไขสินค้า{% endif %}</h1>
+        <form method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">ชื่อสินค้า</label>
+            <input class="form-control" name="name" value="{{ product.name if product else '' }}" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">ราคา</label>
+              <input type="number" step="0.01" min="0" class="form-control" name="price" value="{{ product.price if product else '' }}" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">จำนวนสต็อก</label>
+              <input type="number" min="0" class="form-control" name="stock" value="{{ product.stock if product else 0 }}" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">หมวดหมู่ (คั่นด้วยเครื่องหมาย ",")</label>
+              <input class="form-control" name="category" placeholder="เช่น Electronics, Fashion, New" value="{{ product.category if product else '' }}">
+              <div class="form-text">ใส่หลายหมวดได้โดยคั่นด้วยเครื่องหมายคอมม่า (ตัวอย่าง: Electronics, Fashion)</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">รายละเอียด</label>
+            <textarea rows="3" class="form-control" name="description">{{ product.description if product else '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ลิงก์รูปสินค้า</label>
+            <div class="input-group mb-2">
+              <input class="form-control" id="imageUrlInput" name="image_url" value="{{ product.image_url if product else '' }}">
+              <button type="button" class="btn btn-outline-secondary" id="chooseStaticBtn">เลือกจาก static</button>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">หรืออัพโหลดรูปจากเครื่อง</label>
+              <input class="form-control" type="file" name="image_file" accept="image/*">
+            </div>
+            <div class="form-text">หรือวาง URL ภายนอก เช่น https://.../image.jpg</div>
+          </div>
+
+          <!-- Modal: static images picker -->
+          <div class="modal fade" id="staticImagesModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">เลือกรูปจาก static/images</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div id="staticImagesGrid" class="row g-2">
+                    <div class="col-12 text-center text-muted">กำลังโหลด...</div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Rating</label>
+              <input type="number" class="form-control" name="rating" min="0" max="5" step="0.1" value="{{ product.rating if product else 4.5 }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Review</label>
+              <input class="form-control" name="review_text" value="{{ product.review_text if product else '' }}">
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="is_new" name="is_new" {% if product and product.is_new %}checked{% endif %}>
+              <label class="form-check-label" for="is_new">New</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="is_sale" name="is_sale" {% if product and product.is_sale %}checked{% endif %}>
+              <label class="form-check-label" for="is_sale">Sale</label>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-success" type="submit">บันทึก</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('admin_products') }}">ยกเลิก</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const chooseBtn = document.getElementById('chooseStaticBtn');
+      const imageInput = document.getElementById('imageUrlInput');
+      const imagesModalEl = document.getElementById('staticImagesModal');
+      const imagesModal = new bootstrap.Modal(imagesModalEl);
+      const imagesGrid = document.getElementById('staticImagesGrid');
+
+      chooseBtn.addEventListener('click', function () {
+        imagesGrid.innerHTML = '<div class="col-12 text-center">กำลังโหลด...</div>';
+        imagesModal.show();
+        fetch('{{ url_for("list_static_images") }}')
+          .then(r => r.json())
+          .then(data => {
+            imagesGrid.innerHTML = '';
+            if (!data.images || data.images.length === 0) {
+              imagesGrid.innerHTML = '<div class="col-12 text-center text-muted">ไม่พบไฟล์ใน static/images</div>';
+              return;
+            }
+            data.images.forEach((url) => {
+              const col = document.createElement('div');
+              col.className = 'col-6 col-md-3 text-center';
+              const thumb = document.createElement('img');
+              thumb.src = url;
+              thumb.style.maxWidth = '100%';
+              thumb.style.height = '120px';
+              thumb.style.objectFit = 'cover';
+              thumb.className = 'img-thumbnail mb-1';
+              thumb.title = url;
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'btn btn-sm btn-outline-primary w-100';
+              btn.textContent = 'เลือก';
+              btn.addEventListener('click', function () {
+                imageInput.value = url;
+                imagesModal.hide();
+              });
+              col.appendChild(thumb);
+              col.appendChild(btn);
+              imagesGrid.appendChild(col);
+            });
+          })
+          .catch(err => {
+            imagesGrid.innerHTML = '<div class="col-12 text-danger">เกิดข้อผิดพลาดในการโหลด</div>';
+            console.error(err);
+          });
+      });
+    });
+  </script>
+</body>
+</html>

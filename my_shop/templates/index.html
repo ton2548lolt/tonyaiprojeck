@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>อัมรินทร์ Shop - หน้าแรก</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --coffee-dark: #3f2a1f;
+      --coffee-mid: #5b3a29;
+      --coffee-cream: #f7f2e8;
+      --coffee-light: #fffaf2;
+      --leaf-green: #3e6b53;
+      --leaf-green-hover: #2f5743;
+      --gold: #f6b400;
+    }
+
+    body {
+      background: var(--coffee-cream);
+      color: var(--coffee-dark);
+      font-family: 'Mali', sans-serif;
+      animation: fadeInPage 0.7s ease;
+    }
+
+    h1,
+    h2,
+    h3,
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .am-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+      background-color: var(--coffee-dark);
+    }
+
+    .am-navbar.nav-transparent {
+      background-color: rgba(63, 42, 31, 0.55);
+      backdrop-filter: blur(6px);
+    }
+
+    .brand-wrap {
+      line-height: 1.1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-main {
+      font-size: 1.06rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .brand-main .brand-mark {
+      color: #ffd78f;
+      margin-right: 4px;
+    }
+
+    .brand-tagline {
+      color: #e8d9c0;
+      font-size: 0.78rem;
+      margin-top: 2px;
+    }
+
+    .am-navbar .nav-link {
+      color: #f5e9d4;
+    }
+
+    .am-navbar .nav-link:hover,
+    .am-navbar .nav-link.active {
+      color: #fff;
+    }
+
+    .hero {
+      min-height: 360px;
+      border-radius: 24px;
+      background: linear-gradient(rgba(24, 16, 12, 0.42), rgba(24, 16, 12, 0.42)),
+        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80') center/cover;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .section-reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .section-reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding-left: 1.15rem;
+      padding-right: 1.15rem;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background-color: var(--leaf-green);
+      border-color: var(--leaf-green);
+      box-shadow: 0 8px 16px rgba(62, 107, 83, 0.22);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--leaf-green-hover);
+      border-color: var(--leaf-green-hover);
+    }
+
+    .search-wrap {
+      background: var(--coffee-light);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(75, 46, 31, 0.08);
+    }
+
+    .search-input {
+      border-radius: 999px;
+      border: 1px solid #e0d5bf;
+      box-shadow: 0 2px 8px rgba(75, 46, 31, 0.06);
+    }
+
+    .search-input:focus {
+      border-color: var(--leaf-green);
+      box-shadow: 0 0 0 0.2rem rgba(62, 107, 83, 0.16);
+    }
+
+    .search-icon {
+      border-radius: 999px 0 0 999px;
+      background: #efe4d3;
+      border: 1px solid #e0d5bf;
+      border-right: 0;
+    }
+
+    .category-btn {
+      border-color: var(--coffee-dark);
+      color: var(--coffee-dark);
+      background: transparent;
+    }
+
+    .category-btn:hover {
+      border-color: var(--coffee-mid);
+      background: #eee2d0;
+      color: var(--coffee-mid);
+    }
+
+    .category-btn.active {
+      background: var(--coffee-dark);
+      color: #fff;
+      border-color: var(--coffee-dark);
+    }
+
+    .product-card {
+      border: 0;
+      border-radius: 18px;
+      background: var(--coffee-light);
+      box-shadow: 0 8px 20px rgba(75, 46, 31, 0.08);
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      height: 100%;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 28px rgba(75, 46, 31, 0.16);
+    }
+
+    .product-image-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card img {
+      height: 190px;
+      object-fit: cover;
+      width: 100%;
+      transition: transform 0.35s ease;
+    }
+
+    .product-card:hover img {
+      transform: scale(1.06);
+    }
+
+    .product-body {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .product-title {
+      min-height: 48px;
+      margin-bottom: 0.25rem;
+    }
+
+    .review-snippet {
+      min-height: 44px;
+      margin-bottom: 0.4rem;
+    }
+
+    .actions-row {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.25s ease;
+    }
+
+    .product-card:hover .actions-row {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .wishlist-btn {
+      border: none;
+      background: rgba(255, 255, 255, 0.95);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 18px;
+      z-index: 2;
+    }
+
+    .status-badge {
+      position: absolute;
+      left: 10px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #fff;
+      font-size: 12px;
+      z-index: 2;
+    }
+
+    .badge-hot { top: 10px; background: #ff6b35; }
+    .badge-new { top: 42px; background: #198754; }
+    .badge-sale { top: 74px; background: #d9534f; }
+
+    .rating-stars {
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .trust-grid .feature-item {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 6px 12px rgba(75, 46, 31, 0.08);
+      text-align: center;
+      height: 100%;
+    }
+
+    .reviews-section .review-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 6px 12px rgba(75, 46, 31, 0.08);
+      height: 100%;
+    }
+
+    .am-footer {
+      background: var(--coffee-dark);
+      color: #f5e9d4;
+    }
+
+    .am-footer a {
+      color: #f8edd8;
+      text-decoration: none;
+    }
+
+    .am-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 991.98px) {
+      .actions-row {
+        opacity: 1;
+        transform: none;
+      }
+      .hero {
+        min-height: 300px;
+      }
+      .btn {
+        padding-left: 1.35rem;
+        padding-right: 1.35rem;
+      }
+    }
+
+    @keyframes fadeInPage {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <nav id="mainNavbar" class="navbar navbar-expand-lg navbar-dark am-navbar nav-transparent">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-start gap-2" href="{{ url_for('index') }}">
+        <span class="brand-mark fs-5">🛍️</span>
+        <span class="brand-wrap">
+          <span class="brand-main"><span class="brand-mark">AS</span>อัมรินทร์ Shop</span>
+          <span class="brand-tagline">สินค้าคุณภาพ ราคาดีทุกวัน</span>
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarMenu">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('index') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('cart') }}">Cart <span data-cart-badge class="badge text-bg-light d-none">0</span></a>
+          </li>
+          {% if current_user_name %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('checkout') }}">Checkout</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user_logout') }}">Logout ({{ current_user_name }})</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user_login') }}">Customer Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Admin Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <section class="hero mb-5 section-reveal show">
+      <div>
+        <h1 class="display-5 fw-bold">อัมรินทร์ Shop</h1>
+        <p class="lead mb-4">รวมสินค้าคุณภาพดี ดีไซน์สวย และคัดมาให้ทุกวัน</p>
+        <a href="#products" class="btn btn-primary btn-lg">Shop Now</a>
+      </div>
+    </section>
+
+    <section id="products" class="section-reveal">
+      <div class="search-wrap p-3 p-md-4 mb-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text search-icon">🔎</span>
+              <input id="searchInput" type="text" class="form-control search-input" placeholder="ค้นหาจากชื่อสินค้า..." value="{{ search_text }}">
+            </div>
+          </div>
+          <div class="col-md-6 d-flex flex-wrap gap-2 justify-content-md-end" id="categoryFilter">
+            {% for category in categories %}
+              <a class="btn btn-sm category-btn {% if selected_category == category %}active{% endif %}" href="?category={{ category|urlencode }}{% if search_text %}&search={{ search_text|urlencode }}{% endif %}" data-category="{{ category }}">{{ category }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <h2 class="mb-4">สินค้าแนะนำ</h2>
+      <div class="row g-4">
+        {% for product in products %}
+          <div class="col-12 col-sm-6 col-lg-3 product-item" data-name="{{ product.name|lower }}" data-category="{{ product.category }}">
+            <div class="product-card">
+              <div class="product-image-wrap">
+                {% if product.rating >= 4.6 %}<span class="status-badge badge-hot">🔥 ขายดี</span>{% endif %}
+                {% if product.is_new %}<span class="status-badge badge-new">🆕 สินค้าใหม่</span>{% endif %}
+                {% if product.is_sale %}<span class="status-badge badge-sale">💥 ลดราคา</span>{% endif %}
+                <button type="button" class="wishlist-btn" data-wishlist-id="{{ product.id }}" title="Wishlist">♡</button>
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+              </div>
+              <div class="product-body">
+                <h5 class="product-title">{{ product.name }}</h5>
+                <div class="rating-stars mb-1">⭐ {{ '%.1f'|format(product.rating) }} <span class="text-muted">({{ (product.id * 31) + 93 }} รีวิว)</span></div>
+                <p class="text-muted review-snippet">{{ product.review_text or 'ลูกค้าถูกใจสินค้านี้มาก' }}</p>
+                <p class="fw-bold mt-auto mb-2">฿{{ '%.2f'|format(product.price) }}</p>
+                <div class="d-flex gap-2 actions-row">
+                  <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-outline-secondary btn-sm w-50">Details</a>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm w-50 add-cart-btn"
+                    data-id="{{ product.id }}"
+                    data-name="{{ product.name }}"
+                    data-price="{{ product.price }}"
+                    data-image="{{ product.image_url }}"
+                  >Add to Cart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="reviews-section mt-5 section-reveal">
+      <h2 class="mb-3">รีวิวจากลูกค้า</h2>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="review-box">
+            <div class="rating-stars mb-2">★★★★★</div>
+            <p class="mb-1">"ของจริงสวยมาก ส่งไวมากค่ะ"</p>
+            <small class="text-muted">- คุณฝน (124 รีวิว)</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="review-box">
+            <div class="rating-stars mb-2">★★★★★</div>
+            <p class="mb-1">"คุณภาพเกินราคา ใช้งานดีทุกชิ้น"</p>
+            <small class="text-muted">- คุณต้น (98 รีวิว)</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="review-box">
+            <div class="rating-stars mb-2">★★★★☆</div>
+            <p class="mb-1">"บริการดี ตอบแชตไวมาก"</p>
+            <small class="text-muted">- คุณบี (76 รีวิว)</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-grid mt-5 mb-5 section-reveal">
+      <div class="row g-3">
+        <div class="col-6 col-lg-3"><div class="feature-item">🚚<div class="mt-2 fw-bold">ส่งฟรีทั่วประเทศ</div></div></div>
+        <div class="col-6 col-lg-3"><div class="feature-item">🔒<div class="mt-2 fw-bold">ชำระเงินปลอดภัย</div></div></div>
+        <div class="col-6 col-lg-3"><div class="feature-item">📞<div class="mt-2 fw-bold">บริการลูกค้า 24 ชม.</div></div></div>
+        <div class="col-6 col-lg-3"><div class="feature-item">📦<div class="mt-2 fw-bold">แพ็กของแน่นหนา</div></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="am-footer py-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5 class="mb-3">เกี่ยวกับเรา</h5>
+          <p class="mb-1">อัมรินทร์ Shop</p>
+          <p class="mb-0">สินค้าคุณภาพ ราคาดีทุกวัน</p>
+        </div>
+        <div class="col-md-4">
+          <h5 class="mb-3">บริการลูกค้า</h5>
+          <p class="mb-1"><a href="{{ url_for('cart') }}">ตะกร้าสินค้า</a></p>
+          <p class="mb-1"><a href="{{ url_for('checkout') }}">Checkout</a></p>
+          <p class="mb-1"><a href="{{ url_for('user_login') }}">Customer Login</a></p>
+          <p class="mb-0"><a href="{{ url_for('login') }}">Admin Login</a></p>
+        </div>
+        <div class="col-md-4">
+          <h5 class="mb-3">ติดต่อเรา</h5>
+          <p class="mb-1">Facebook: Amarin Shop</p>
+          <p class="mb-1">Line: @amarinshop</p>
+          <p class="mb-1">โทร: 02-123-4567</p>
+          <p class="mb-0">Email: support@amarinshop.com</p>
+        </div>
+      </div>
+      <hr class="border-light border-opacity-25 my-4">
+      <div class="text-center small">© 2026 อัมรินทร์ Shop. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='store.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navbar = document.getElementById('mainNavbar');
+      const searchInput = document.getElementById('searchInput');
+      const productItems = Array.from(document.querySelectorAll('.product-item'));
+      const categoryButtons = Array.from(document.querySelectorAll('.category-btn'));
+      const revealSections = document.querySelectorAll('.section-reveal');
+      let activeCategory = categoryButtons.find((button) => button.classList.contains('active'))?.dataset.category || 'All';
+
+      function updateNavbarState() {
+        if (window.scrollY < 90) {
+          navbar.classList.add('nav-transparent');
+        } else {
+          navbar.classList.remove('nav-transparent');
+        }
+      }
+
+      function filterProducts() {
+        const searchText = (searchInput.value || '').toLowerCase().trim();
+        productItems.forEach((card) => {
+          const name = card.dataset.name || '';
+          const category = card.dataset.category || 'All';
+          const categoryList = category.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+          const matchSearch = !searchText || name.includes(searchText);
+          const matchCategory = activeCategory === 'All' || categoryList.includes((activeCategory || '').toLowerCase());
+          card.classList.toggle('d-none', !(matchSearch && matchCategory));
+        });
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+          }
+        });
+      }, { threshold: 0.15 });
+      revealSections.forEach((section) => observer.observe(section));
+
+      updateNavbarState();
+      window.addEventListener('scroll', updateNavbarState);
+      searchInput.addEventListener('input', filterProducts);
+
+      categoryButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+          categoryButtons.forEach((b) => b.classList.remove('active'));
+          this.classList.add('active');
+          activeCategory = this.dataset.category;
+          filterProducts();
+        });
+      });
+
+      document.querySelectorAll('.add-cart-btn').forEach((button) => {
+        button.addEventListener('click', function () {
+          addToCart({
+            id: Number(this.dataset.id),
+            name: this.dataset.name,
+            price: Number(this.dataset.price),
+            image_url: this.dataset.image,
+          });
+          this.textContent = 'Added';
+          setTimeout(() => {
+            this.textContent = 'Add to Cart';
+          }, 900);
+        });
+      });
+
+      document.querySelectorAll('[data-wishlist-id]').forEach((button) => {
+        const productId = Number(button.dataset.wishlistId);
+        if (isWishlist(productId)) {
+          button.textContent = '♥';
+        }
+        button.addEventListener('click', function () {
+          const card = this.closest('.product-item');
+          const addBtn = card.querySelector('.add-cart-btn');
+          const active = toggleWishlist({
+            id: productId,
+            name: addBtn.dataset.name,
+            price: Number(addBtn.dataset.price),
+            image_url: addBtn.dataset.image,
+          });
+          this.textContent = active ? '♥' : '♡';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
