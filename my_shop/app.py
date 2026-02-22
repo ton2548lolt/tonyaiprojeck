@@ -18,6 +18,44 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+# --- Site settings persistence (instance/settings.json) -------------------------------------------------
+SETTINGS_PATH = os.path.join(app.instance_path, 'settings.json')
+
+
+def load_site_settings():
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+        if not os.path.exists(SETTINGS_PATH):
+            # default settings
+            default = {
+                'hero_image': 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80',
+                'hero_overlay': 'rgba(24, 16, 12, 0.42)'
+            }
+            with open(SETTINGS_PATH, 'w', encoding='utf-8') as f:
+                json.dump(default, f, ensure_ascii=False, indent=2)
+            return default
+
+        with open(SETTINGS_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {
+            'hero_image': 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80',
+            'hero_overlay': 'rgba(24, 16, 12, 0.42)'
+        }
+
+
+def save_site_settings(settings: dict):
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+        with open(SETTINGS_PATH, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception:
+        return False
+
+# -------------------------------------------------------------------------------------------------------
+
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -158,6 +196,12 @@ with app.app_context():
     db.create_all()
     migrate_schema_for_existing_db()
     seed_products()
+    # ensure site settings file exists at startup
+    try:
+        load_site_settings()
+    except Exception:
+        # best-effort only; failures will be surfaced when saving via admin
+        pass
 
 
 def save_uploaded_image(file_storage):
@@ -234,12 +278,14 @@ def index():
                 category_set.add(part)
 
     categories = ['All'] + sorted(category_set)
+    site_settings = load_site_settings()
     return render_template(
         'index.html',
         products=products,
         categories=categories,
         selected_category=category,
         search_text=search,
+        site_settings=site_settings,
     )
 
 
@@ -646,6 +692,9 @@ def list_static_images():
     # return URLs relative to server root
     images_urls = [f'/static/images/{fn}' for fn in sorted(images)]
     return jsonify({'images': images_urls})
+
+
+# Theme upload endpoint removed (feature disabled)
 
 
 if __name__ == '__main__':
